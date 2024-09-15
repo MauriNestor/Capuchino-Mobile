@@ -70,7 +70,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             CalendarioScesiTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { paddingValues ->
-                    Column(modifier = Modifier.fillMaxHeight()) {
+                    Column(modifier = Modifier.fillMaxHeight().padding(paddingValues)) {
                         Schedule(
                             events = getSampleEvents(),
                             daySize = ScheduleSize.FixedCount(6),
