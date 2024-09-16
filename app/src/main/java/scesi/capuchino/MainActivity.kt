@@ -6,8 +6,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -20,6 +23,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -37,12 +45,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -70,18 +83,169 @@ class MainActivity : ComponentActivity() {
         setContent {
             CalendarioScesiTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { paddingValues ->
-                    Column(modifier = Modifier.fillMaxHeight().padding(paddingValues)) {
-                        Schedule(
-                            events = getSampleEvents(),
-                            daySize = ScheduleSize.FixedCount(6),
-                            modifier = Modifier.weight(0.5f)
-                        )
-                        TestText(modifier = Modifier.weight(0.5f))
+                    Column(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .padding(paddingValues)
+                    ) {
+                        Calendar()
+//                        Schedule(
+//                            events = getSampleEvents(),
+//                            daySize = ScheduleSize.FixedCount(6),
+//                            modifier = Modifier.weight(0.5f)
+//                        )
+//                        TestText(modifier = Modifier.weight(0.5f))
+//                        CalendarDate()
+//                        Schedule(
+//                            events = getSampleEvents(),
+//                            daySize = ScheduleSize.FixedCount(6),
+//                            modifier = Modifier.weight(0.5f)
+//                        )
+//                        DayView(modifier = Modifier.weight(0.5f))
                     }
                 }
             }
         }
     }
+}
+
+@Composable
+fun Calendar() {
+    val items = (0 until 20).toList()
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(5),
+        horizontalArrangement = Arrangement.spacedBy(0.dp),
+        verticalArrangement = Arrangement.spacedBy(0.dp)
+    ) {
+        items(
+            items,
+            // not required as it is the default
+            span = { GridItemSpan(1) }
+        ) {
+
+            Text(
+                "Item $it "+ (if(it==7)"dasdsadsadsadasd asdas ads" else ""),
+                Modifier
+                    .border(1.dp, Color.Blue)
+                    .fillMaxHeight()
+                    .wrapContentSize()
+            )
+        }
+    }
+
+
+}
+
+@Composable
+fun CalendarDate() {
+    val textMeasure = rememberTextMeasurer()
+    val totalDays = 6
+    Canvas(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(),
+
+        ) {
+        val width = size.width
+        val height = size.height
+        val daysInMonth = 7
+        val totalRow = 0
+        val boxHeight = height / totalRow
+        val boxWidth = width / daysInMonth
+        for (days in 1..totalDays) {
+            val row = (days - 1) / daysInMonth
+            val column = (days - 1) % daysInMonth
+            val x = column * boxWidth
+            val y = row * boxHeight
+            drawRect(color = Color.Gray, topLeft = Offset(x, y), size = Size(boxWidth, boxHeight))
+            drawText(
+                textMeasure,
+                text = "$days",
+                topLeft = Offset(x = x + boxWidth / 3, y = y + boxHeight / 2.5f)
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun DayView(modifier: Modifier = Modifier) {
+    val textMeasure = rememberTextMeasurer()
+
+    val timeList: MutableList<String> = mutableListOf(
+        "1:00 AM", "2:00 AM", "3:00 AM", "4:00 AM", "5:00 AM",
+        "6:00 AM", "7:00 AM", "8:00 AM", "9:00 AM", "10:00 AM",
+        "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM",
+        "4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM", "8:00 PM",
+        "9:00 PM", "10:00 PM", "11:00 PM"
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+    ) {
+
+        Canvas(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(2000.dp)
+                .padding(16.dp)
+        ) {
+            val totalLine = 23
+
+            val height = size.height
+            val width = size.width
+
+            val boxWidth = width / totalLine
+            val boxHeight = height / totalLine
+
+
+
+            for (i in 0.until(timeList.size)) {
+                val y = height * i / totalLine
+
+                val textLayoutResult = textMeasure.measure(
+                    text = AnnotatedString(timeList[i]),
+                    style = TextStyle(color = Color.White, textAlign = TextAlign.Center)
+                )
+
+                val textHeight = textLayoutResult.size.height.toFloat()
+                val textWidth = textLayoutResult.size.width.toFloat()
+
+                drawLine(
+                    color = Color.White,
+                    start = Offset(boxWidth / 5 + textWidth, y),
+                    end = Offset(width, y)
+                )
+
+                drawText(
+                    textLayoutResult = textLayoutResult,
+                    topLeft = Offset(0f, boxHeight * i - textHeight / 2),
+
+                    )
+
+                drawLine(
+                    color = Color.White,
+                    start = Offset(x = width / 5, height + boxHeight),
+                    end = Offset(x = width / 5, 0f)
+                )
+
+
+                val title =
+                    textMeasure.measure(AnnotatedString("Materia"))
+
+                drawText(
+                    title, topLeft =
+                    Offset(width / 4, y + textHeight), color = Color.White
+                )
+            }
+        }
+
+
+    }
+
+
 }
 
 @Composable
@@ -91,7 +255,6 @@ fun TestText(modifier: Modifier = Modifier) {
         // Contenido inferior
     }
 }
-
 
 
 inline class SplitType private constructor(val value: Int) {
@@ -174,7 +337,6 @@ fun BasicEvent(
         }
     }
 }
-
 
 
 class EventsProvider : PreviewParameterProvider<Event> {
@@ -304,22 +466,11 @@ fun ScheduleSidebar(
         if (firstHour == minTime) 0 else ChronoUnit.MINUTES.between(minTime, firstHour.plusHours(1))
     val firstHourOffset = hourHeight * (firstHourOffsetMinutes / 60f)
     val startTime = if (firstHour == minTime) firstHour else firstHour.plusHours(1)
-    val times = listOf<String>(
-        "6:45",
-        "8:15",
-        "9:45",
-        "11:15",
-        "12:45",
-        "14:15",
-        "15:45",
-        "17:15",
-        "18:45",
-        "20:15"
-    )
+
     Column(modifier = modifier) {
         Spacer(modifier = Modifier.height(firstHourOffset))
         repeat(numHours) { i ->
-            Box(modifier = Modifier.height(hourHeight)) {
+            Box(modifier = Modifier.height(hourHeight + (if (i % 2 == 0) 30.dp else 0.dp))) {
 //                Text(
 //                    text = ,
 //                    fontSize = 10.sp,
