@@ -21,14 +21,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import scesi.capuchino.ui.theme.ComposeTheme
+import scesi.capuchino.ui.theme.CalendarioScesiTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            ComposeTheme {
+            CalendarioScesiTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     CalendarScreen(
                         modifier = Modifier.padding(innerPadding)
@@ -92,7 +92,7 @@ fun CalendarGrid(modifier: Modifier = Modifier) {
     val density = LocalDensity.current
 
     val tareas = listOf(
-        Tarea(dia = 2, hora = "10:00", nombre = "Boris Calancha G3") // Tarea en Miércoles a las 10:00
+        Tarea(dia = 2, hora = "10:00", nombre = "Boris Calancha G3 Boris Calancha G3Boris Calancha G3Boris Calancha G3Boris Calancha G3") // Tarea en Miércoles a las 10:00
     )
 
     Column(
@@ -102,13 +102,13 @@ fun CalendarGrid(modifier: Modifier = Modifier) {
             .padding(cellPadding)
     ) {
         hoursOfDay.forEach { hour ->
-            var rowHeight by remember { mutableStateOf(50.dp) }
+//            var rowHeight by remember { mutableStateOf(50.dp) }
 
-            Row(modifier = Modifier.fillMaxWidth()) {
+            Row(modifier = Modifier.fillMaxWidth().height(intrinsicSize = IntrinsicSize.Max)) {
                 Box(
                     modifier = Modifier
                         .width(50.dp)
-                        .height(rowHeight)
+                        .fillMaxHeight()
                         .padding(cellPadding)
                 ) {
                     Text(
@@ -130,14 +130,15 @@ fun CalendarGrid(modifier: Modifier = Modifier) {
                                 .weight(1f)
                                 .padding(cellPadding)
                                 .background(Color.Green)
-                                .onGloballyPositioned { coordinates ->
-                                    val taskHeight = with(density) { coordinates.size.height.toDp() }
-
-                                    if (taskHeight > rowHeight) {
-                                        rowHeight = taskHeight
-                                    }
-                                },
-                            contentAlignment = Alignment.Center
+//                                .onGloballyPositioned { coordinates ->
+//                                    val taskHeight =
+//                                        with(density) { coordinates.size.height.toDp() }
+//
+//                                    if (taskHeight > rowHeight) {
+//                                        rowHeight = taskHeight
+//                                    }
+//                                },
+//                            contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = tarea.nombre,
@@ -150,8 +151,7 @@ fun CalendarGrid(modifier: Modifier = Modifier) {
                         Box(
                             modifier = Modifier
                                 .weight(1f)
-                                .height(rowHeight)
-                                .aspectRatio(1f)
+                                .fillMaxHeight()
                                 .padding(cellPadding)
                                 .background(MaterialTheme.colorScheme.surfaceVariant),
                             contentAlignment = Alignment.Center
@@ -167,7 +167,7 @@ fun CalendarGrid(modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun CalendarScreenPreview() {
-    ComposeTheme {
+    CalendarioScesiTheme {
         CalendarScreen()
     }
 }
