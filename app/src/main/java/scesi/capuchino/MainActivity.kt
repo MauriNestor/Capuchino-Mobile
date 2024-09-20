@@ -15,8 +15,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -75,12 +73,11 @@ fun DaysOfWeekHeader(modifier: Modifier = Modifier) {
     }
 }
 
-// Clase tarea
-data class Tarea(
-    val dia: Int,
-    val hora: String,
-    val nombre: String
-)
+sealed class CalendarItem {
+    data class Tarea(val dia: Int, val hora: String, val nombre: String) : CalendarItem()
+    object Empty : CalendarItem()
+}
+
 
 @Composable
 fun CalendarGrid(modifier: Modifier = Modifier) {
@@ -89,10 +86,11 @@ fun CalendarGrid(modifier: Modifier = Modifier) {
 
     val scrollState = rememberScrollState()
 
-    val density = LocalDensity.current
+    val calendarItems = listOf(
+        CalendarItem.Tarea(dia = 2, hora = "10:00", nombre = "Boris Calancha G3"),
+        CalendarItem.Tarea(dia = 2, hora = "10:00", nombre = "Leticia Coca G3"),
+        CalendarItem.Tarea(dia = 4, hora = "15:00", nombre = "Henry tapia perro G3"),
 
-    val tareas = listOf(
-        Tarea(dia = 2, hora = "10:00", nombre = "Boris Calancha G3 Boris Calancha G3Boris Calancha G3Boris Calancha G3Boris Calancha G3") // Tarea en Miércoles a las 10:00
     )
 
     Column(
@@ -102,7 +100,6 @@ fun CalendarGrid(modifier: Modifier = Modifier) {
             .padding(cellPadding)
     ) {
         hoursOfDay.forEach { hour ->
-//            var rowHeight by remember { mutableStateOf(50.dp) }
 
             Row(modifier = Modifier.fillMaxWidth().height(intrinsicSize = IntrinsicSize.Max)) {
                 Box(
@@ -119,43 +116,39 @@ fun CalendarGrid(modifier: Modifier = Modifier) {
                     )
                 }
 
-                // Celdas para los días
                 repeat(6) { diaIndex ->
-                    val tarea = tareas.find { it.dia == diaIndex && it.hora == hour }
+                    val item = calendarItems.find { it is CalendarItem.Tarea && it.dia == diaIndex && it.hora == hour }
+                        ?: CalendarItem.Empty
 
-                    if (tarea != null) {
-                        // Celda con tarea
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(cellPadding)
-                                .background(Color.Green)
-//                                .onGloballyPositioned { coordinates ->
-//                                    val taskHeight =
-//                                        with(density) { coordinates.size.height.toDp() }
-//
-//                                    if (taskHeight > rowHeight) {
-//                                        rowHeight = taskHeight
-//                                    }
-//                                },
-//                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = tarea.nombre,
-                                fontSize = 9.sp,
-                                color = Color.Black
-                            )
+                    when (item) {
+                        is CalendarItem.Tarea -> {
+                            // Celda con tarea
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(cellPadding)
+                                    .background(Color.Green),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = item.nombre,
+                                    fontSize = 9.sp,
+                                    color = Color.Black
+                                )
+                            }
                         }
-                    } else {
-                        // Celda vacía
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxHeight()
-                                .padding(cellPadding)
-                                .background(MaterialTheme.colorScheme.surfaceVariant),
-                            contentAlignment = Alignment.Center
-                        ) {
+
+                        is CalendarItem.Empty -> {
+                            // Celda vacía
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight()
+                                    .padding(cellPadding)
+                                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                                contentAlignment = Alignment.Center
+                            ) {
+                            }
                         }
                     }
                 }
