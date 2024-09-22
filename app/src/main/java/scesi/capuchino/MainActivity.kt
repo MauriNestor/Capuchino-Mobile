@@ -74,23 +74,31 @@ fun DaysOfWeekHeader(modifier: Modifier = Modifier) {
 }
 
 sealed class CalendarItem {
-    data class Tarea(val dia: Int, val hora: String, val nombre: String) : CalendarItem()
+    data class Casilla(val dia: Int, val hora: String, val tareas: List<Tarea>) : CalendarItem()
     object Empty : CalendarItem()
 }
+data class Tarea(val nombre: String)
+
 
 
 @Composable
 fun CalendarGrid(modifier: Modifier = Modifier) {
-    val hoursOfDay = (9..21).map { "$it:00" }
-    val cellPadding = 4.dp
+    val hoursOfDay = generateSequence(6 * 60 + 45) { it + 45 }
+        .takeWhile { it < 21 * 60 }
+        .map { minutesToHourString(it) }
+        .toList()
 
+    val cellPadding = 4.dp
     val scrollState = rememberScrollState()
 
     val calendarItems = listOf(
-        CalendarItem.Tarea(dia = 2, hora = "10:00", nombre = "Boris Calancha G3"),
-        CalendarItem.Tarea(dia = 2, hora = "10:00", nombre = "Leticia Coca G3"),
-        CalendarItem.Tarea(dia = 4, hora = "15:00", nombre = "Henry tapia perro G3"),
-
+        CalendarItem.Casilla(dia = 2, hora = "06:45", tareas = listOf(
+            Tarea("Boris Calancha G3"),
+            Tarea("Leticia Coca G3")
+        )),
+        CalendarItem.Casilla(dia = 4, hora = "15:00", tareas = listOf(
+            Tarea("Henry Tapia G3")
+        )),
     )
 
     Column(
@@ -117,29 +125,32 @@ fun CalendarGrid(modifier: Modifier = Modifier) {
                 }
 
                 repeat(6) { diaIndex ->
-                    val item = calendarItems.find { it is CalendarItem.Tarea && it.dia == diaIndex && it.hora == hour }
+                    val item = calendarItems.find { it is CalendarItem.Casilla && it.dia == diaIndex && it.hora == hour }
                         ?: CalendarItem.Empty
 
                     when (item) {
-                        is CalendarItem.Tarea -> {
-                            // Celda con tarea
+                        is CalendarItem.Casilla -> {
+                            val hasCollision = item.tareas.size > 1
                             Box(
                                 modifier = Modifier
                                     .weight(1f)
                                     .padding(cellPadding)
-                                    .background(Color.Green),
+                                    .background(if (hasCollision) Color.Red else Color.Green),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(
-                                    text = item.nombre,
-                                    fontSize = 9.sp,
-                                    color = Color.Black
-                                )
+                                Column {
+                                    item.tareas.forEach { tarea ->
+                                        Text(
+                                            text = tarea.nombre,
+                                            fontSize = 9.sp,
+                                            color = Color.Black
+                                        )
+                                    }
+                                }
                             }
                         }
 
                         is CalendarItem.Empty -> {
-                            // Celda vacía
                             Box(
                                 modifier = Modifier
                                     .weight(1f)
@@ -155,6 +166,12 @@ fun CalendarGrid(modifier: Modifier = Modifier) {
             }
         }
     }
+}
+
+fun minutesToHourString(minutes: Int): String {
+    val hours = minutes / 60
+    val mins = minutes % 60
+    return String.format("%02d:%02d", hours, mins)
 }
 
 @Preview(showBackground = true)
