@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -15,12 +16,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import scesi.capuchino.ui.models.times
 import scesi.capuchino.ui.theme.CalendarioScesiTheme
 
 class MainActivity : ComponentActivity() {
@@ -58,7 +59,7 @@ fun DaysOfWeekHeader(modifier: Modifier = Modifier) {
     val daysOfWeek = listOf("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado")
 
     Row(modifier = modifier.fillMaxWidth()) {
-        Spacer(modifier = Modifier.width(50.dp)) // Espacio para la columna de horas
+        Text(text = "00:00", fontSize = 12.sp, color = Color.White  ) // Texto para alinear las horas
         daysOfWeek.forEach { day ->
             Box(
                 modifier = Modifier
@@ -79,37 +80,42 @@ fun DaysOfWeekHeader(modifier: Modifier = Modifier) {
 data class Tarea(
     val dia: Int,
     val hora: String,
-    val nombre: String
+    val nombre: String,
 )
 
 @Composable
 fun CalendarGrid(modifier: Modifier = Modifier) {
-    val hoursOfDay = (9..21).map { "$it:00" }
+    val hoursOfDay = times
     val cellPadding = 4.dp
 
     val scrollState = rememberScrollState()
 
-    val density = LocalDensity.current
 
     val tareas = listOf(
-        Tarea(dia = 2, hora = "10:00", nombre = "Boris Calancha G3 Boris Calancha G3Boris Calancha G3Boris Calancha G3Boris Calancha G3") // Tarea en Miércoles a las 10:00
+        Tarea(
+            dia = 2,
+            hora = "09:45",
+            nombre = "Boris Calancha G3 Boris Calancha G3Boris Calancha G3Boris Calancha G3Boris Calancha G3"
+        ),
+        Tarea(dia = 1, hora = "09:45", nombre = "Boris Calancha ")
     )
 
     Column(
         modifier = modifier
             .fillMaxWidth()
             .verticalScroll(scrollState)
-            .padding(cellPadding)
     ) {
         hoursOfDay.forEach { hour ->
-//            var rowHeight by remember { mutableStateOf(50.dp) }
-
-            Row(modifier = Modifier.fillMaxWidth().height(intrinsicSize = IntrinsicSize.Max)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(intrinsicSize = IntrinsicSize.Max)
+            ) {
                 Box(
                     modifier = Modifier
-                        .width(50.dp)
+                        .wrapContentWidth()
+                        .border(0.5.dp, Color.Gray)
                         .fillMaxHeight()
-                        .padding(cellPadding)
                 ) {
                     Text(
                         text = hour,
@@ -128,22 +134,15 @@ fun CalendarGrid(modifier: Modifier = Modifier) {
                         Box(
                             modifier = Modifier
                                 .weight(1f)
-                                .padding(cellPadding)
+                                .fillMaxHeight()
+                                .border(0.5.dp, Color.Gray)
                                 .background(Color.Green)
-//                                .onGloballyPositioned { coordinates ->
-//                                    val taskHeight =
-//                                        with(density) { coordinates.size.height.toDp() }
-//
-//                                    if (taskHeight > rowHeight) {
-//                                        rowHeight = taskHeight
-//                                    }
-//                                },
-//                            contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = tarea.nombre,
                                 fontSize = 9.sp,
-                                color = Color.Black
+                                color = Color.Black,
+                                modifier = Modifier.padding(4.dp)
                             )
                         }
                     } else {
@@ -151,11 +150,10 @@ fun CalendarGrid(modifier: Modifier = Modifier) {
                         Box(
                             modifier = Modifier
                                 .weight(1f)
-                                .fillMaxHeight()
-                                .padding(cellPadding)
-                                .background(MaterialTheme.colorScheme.surfaceVariant),
-                            contentAlignment = Alignment.Center
-                        ) {
+                                .border(0.5.dp, Color.Gray)
+                                .fillMaxHeight(),
+                            contentAlignment = Alignment.Center,
+                            ) {
                         }
                     }
                 }
