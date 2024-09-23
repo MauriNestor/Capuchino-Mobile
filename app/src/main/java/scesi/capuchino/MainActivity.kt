@@ -16,12 +16,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import scesi.capuchino.ui.models.getFormattedDay
+import scesi.capuchino.ui.models.isInDay
+import scesi.capuchino.ui.models.isInHour
 import scesi.capuchino.ui.models.times
+import scesi.capuchino.ui.repositories.SubjectRepository
 import scesi.capuchino.ui.theme.CalendarioScesiTheme
 
 class MainActivity : ComponentActivity() {
@@ -86,19 +89,9 @@ data class Tarea(
 @Composable
 fun CalendarGrid(modifier: Modifier = Modifier) {
     val hoursOfDay = times
-    val cellPadding = 4.dp
 
     val scrollState = rememberScrollState()
-
-
-    val tareas = listOf(
-        Tarea(
-            dia = 2,
-            hora = "09:45",
-            nombre = "Boris Calancha G3 Boris Calancha G3Boris Calancha G3Boris Calancha G3Boris Calancha G3"
-        ),
-        Tarea(dia = 1, hora = "09:45", nombre = "Boris Calancha ")
-    )
+    val subjects = SubjectRepository.getSubjects()
 
     Column(
         modifier = modifier
@@ -127,9 +120,9 @@ fun CalendarGrid(modifier: Modifier = Modifier) {
 
                 // Celdas para los días
                 repeat(6) { diaIndex ->
-                    val tarea = tareas.find { it.dia == diaIndex && it.hora == hour }
+                    val subject = subjects.find { it.isInDay(diaIndex) && it.isInHour(hour) }
 
-                    if (tarea != null) {
+                    if (subject != null) {
                         // Celda con tarea
                         Box(
                             modifier = Modifier
@@ -139,7 +132,7 @@ fun CalendarGrid(modifier: Modifier = Modifier) {
                                 .background(Color.Green)
                         ) {
                             Text(
-                                text = tarea.nombre,
+                                text = subject.teacher + " " + subject.code,
                                 fontSize = 9.sp,
                                 color = Color.Black,
                                 modifier = Modifier.padding(4.dp)
