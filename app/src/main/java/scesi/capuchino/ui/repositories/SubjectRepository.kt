@@ -37,7 +37,7 @@ const val subjectJsonList = """
               "duration": 2,
               "room": "693B",
               "teacher": "CESPEDES GUIZADA MARIA BENITA",
-              "is_class": true
+              "isClass": true
             },
             {
               "day": "VI",
