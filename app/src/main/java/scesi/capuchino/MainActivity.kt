@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -55,8 +56,9 @@ fun CalendarScreen(modifier: Modifier = Modifier) {
 fun DaysOfWeekHeader(modifier: Modifier = Modifier) {
     val daysOfWeek = listOf("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado")
 
-    Row(modifier = modifier.fillMaxWidth()) {
-        Spacer(modifier = Modifier.width(50.dp)) // Espacio para la columna de horas
+    Row(modifier = modifier.fillMaxWidth()
+        .padding(top = 50.dp) ) {
+        Spacer(modifier = Modifier.width(50.dp))
         daysOfWeek.forEach { day ->
             Box(
                 modifier = Modifier
@@ -66,7 +68,7 @@ fun DaysOfWeekHeader(modifier: Modifier = Modifier) {
                 Text(
                     text = day,
                     modifier = Modifier.align(Alignment.Center),
-                    style = TextStyle(fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
+                    style = TextStyle(fontSize = 12.sp)
                 )
             }
         }
@@ -93,11 +95,11 @@ fun CalendarGrid(modifier: Modifier = Modifier) {
 
     val calendarItems = listOf(
         CalendarItem.Casilla(dia = 2, hora = "06:45", tareas = listOf(
-            Tarea("Boris Calancha G3"),
-            Tarea("Leticia Coca G3")
+            Tarea("base de datos G3"),
+            Tarea("introduccion a la programacion  G3")
         )),
-        CalendarItem.Casilla(dia = 4, hora = "15:00", tareas = listOf(
-            Tarea("Henry Tapia G3")
+        CalendarItem.Casilla(dia = 4, hora = "15:45", tareas = listOf(
+            Tarea("simulacion de sistemas G3")
         )),
     )
 
@@ -114,7 +116,7 @@ fun CalendarGrid(modifier: Modifier = Modifier) {
                     modifier = Modifier
                         .width(50.dp)
                         .fillMaxHeight()
-                        .padding(cellPadding)
+                        .border(0.1.dp, Color.DarkGray)
                 ) {
                     Text(
                         text = hour,
@@ -125,7 +127,7 @@ fun CalendarGrid(modifier: Modifier = Modifier) {
                 }
 
                 repeat(6) { diaIndex ->
-                    val item = calendarItems.find { it is CalendarItem.Casilla && it.dia == diaIndex && it.hora == hour }
+                    val item = calendarItems.find { true && it.dia == diaIndex && it.hora == hour }
                         ?: CalendarItem.Empty
 
                     when (item) {
@@ -134,16 +136,17 @@ fun CalendarGrid(modifier: Modifier = Modifier) {
                             Box(
                                 modifier = Modifier
                                     .weight(1f)
-                                    .padding(cellPadding)
+                                    .padding(0.1.dp)
+                                    .border(1.dp, Color.Black)
                                     .background(if (hasCollision) Color.Red else Color.Green),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Column {
+                                Column(modifier = Modifier.padding(1.dp)) {
                                     item.tareas.forEach { tarea ->
                                         Text(
                                             text = tarea.nombre,
                                             fontSize = 9.sp,
-                                            color = Color.Black
+                                            color = Color.White
                                         )
                                     }
                                 }
@@ -155,9 +158,7 @@ fun CalendarGrid(modifier: Modifier = Modifier) {
                                 modifier = Modifier
                                     .weight(1f)
                                     .fillMaxHeight()
-                                    .padding(cellPadding)
-                                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                                contentAlignment = Alignment.Center
+                                    .border(0.1.dp, Color.DarkGray)
                             ) {
                             }
                         }
