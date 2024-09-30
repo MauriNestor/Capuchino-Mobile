@@ -20,7 +20,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import scesi.capuchino.ui.models.getFormattedDay
 import scesi.capuchino.ui.models.isInDay
 import scesi.capuchino.ui.models.isInHour
 import scesi.capuchino.ui.models.times
@@ -91,7 +90,7 @@ fun CalendarGrid(modifier: Modifier = Modifier) {
     val hoursOfDay = times
 
     val scrollState = rememberScrollState()
-    val subjects = SubjectRepository.getSubjects()
+    val subjects = SubjectRepository.getSelectedSubjects()
 
     Column(
         modifier = modifier
@@ -120,9 +119,9 @@ fun CalendarGrid(modifier: Modifier = Modifier) {
 
                 // Celdas para los días
                 repeat(6) { diaIndex ->
-                    val subject = subjects.find { it.isInDay(diaIndex) && it.isInHour(hour) }
+                    val selectedSubject = subjects.find { it.isInDay(diaIndex) && it.isInHour(hour) }
 
-                    if (subject != null) {
+                    if (selectedSubject != null) {
                         // Celda con tarea
                         Box(
                             modifier = Modifier
@@ -132,7 +131,7 @@ fun CalendarGrid(modifier: Modifier = Modifier) {
                                 .background(Color.Green)
                         ) {
                             Text(
-                                text = subject.teacher + " " + subject.code,
+                                text = "${selectedSubject.name} ${selectedSubject.teacher} G:${selectedSubject.codeGroup} ",
                                 fontSize = 9.sp,
                                 color = Color.Black,
                                 modifier = Modifier.padding(4.dp)

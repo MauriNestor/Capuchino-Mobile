@@ -1,17 +1,15 @@
 package scesi.capuchino.ui.models
 
-data class Subject(
-
+class Subject(
     var code: String,
-    var teacher: String,
-    var schedule: ArrayList<Schedule> = arrayListOf(),
+    var name: String,
+    var groups: ArrayList<Group> = arrayListOf(),
 )
 
-
 fun Subject.isInDay(dayOfWeek: Int): Boolean {
-    return this.schedule.any { it.getFormattedDay()?.dayOfWeek == dayOfWeek }
+    return this.groups.any { it.isInDay(dayOfWeek) }
 }
 
-fun Subject.isInHour(hour: String): Boolean{
-    return this.schedule.any { it.getFormattedHour() == hour}
+fun Subject.isInHour(hour: String): Boolean {
+    return this.groups.any { it.isInHour(hour) }
 }
