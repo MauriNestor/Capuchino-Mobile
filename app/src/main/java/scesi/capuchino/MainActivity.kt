@@ -79,11 +79,11 @@ fun DaysOfWeekHeader(modifier: Modifier = Modifier) {
     }
 }
 
-sealed class CalendarItem {
-    data class Casilla(val dia: Int, val hora: String, val tareas: List<Tarea>) : CalendarItem()
-    object Empty : CalendarItem()
-}
-data class Tarea(val nombre: String)
+//sealed class CalendarItem {
+//    data class Casilla(val dia: Int, val hora: String, val tareas: List<Tarea>) : CalendarItem()
+//    object Empty : CalendarItem()
+//}
+//data class Tarea(val nombre: String)
 
 
 
@@ -134,19 +134,19 @@ fun CalendarGrid(modifier: Modifier = Modifier, selectedSubjects: List<SelectedS
                                 .weight(1f)
                                 .padding(0.1.dp)
                                 .border(1.dp, Color.Black)
-                                .background(Color.Green),
+                                .background(Color.Yellow),
                             contentAlignment = Alignment.Center
                         ) {
                             Column(modifier = Modifier.padding(1.dp)) {
                                 Text(
                                     text = subjectItem.name, // Nombre de la materia
                                     fontSize = 9.sp,
-                                    color = Color.White
+                                    color = Color.Black
                                 )
                                 Text(
                                     text = schedule?.room ?: "Sin aula", // Aula
                                     fontSize = 9.sp,
-                                    color = Color.White
+                                    color = Color.Red
                                 )
                             }
                         }
