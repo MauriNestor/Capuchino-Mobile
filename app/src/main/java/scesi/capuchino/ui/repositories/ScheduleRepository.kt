@@ -3,64 +3,62 @@ package scesi.capuchino.ui.repositories
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import scesi.capuchino.ui.models.Course
+import scesi.capuchino.ui.models.SelectedSubject
 import scesi.capuchino.ui.models.Schedule
 
-open class ScheduleRepository(private val jsonSource: String? = null) {
+class ScheduleRepository {
 
-    private val defaultJson = """
+    private val jsonSource = """
     {
-      "code": "A",
-      "subjects": [
+      "levels": [
         {
-          "code": 1803001,
-          "name": "INGLES I",
-          "groups": [
+          "code": "A",
+          "subjects": [
             {
-              "code": "1",
-              "teacher": "CESPEDES GUIZADA MARIA BENITA",
-              "schedule": [
+              "code": 1803001,
+              "name": "INGLES I",
+              "groups": [
                 {
-                  "day": "MA",
-                  "start": "0815",
-                  "end": "0945",
-                  "duration": 2,
-                  "room": "693B",
+                  "code": "1",
                   "teacher": "CESPEDES GUIZADA MARIA BENITA",
-                  "isClass": true
-                },
-                {
-                  "day": "VI",
-                  "start": "0815",
-                  "end": "0945",
-                  "duration": 2,
-                  "room": "691D",
-                  "teacher": "CESPEDES GUIZADA MARIA BENITA",
-                  "isClass": true
+                  "schedule": [
+                    {
+                      "day": "MA",
+                      "start": "815",
+                      "end": "945",
+                      "room": "693B"
+                    },
+                    {
+                      "day": "VI",
+                      "start": "815",
+                      "end": "945",
+                      "room": "691D"
+                    }
+                  ]
                 }
-           
               ]
-            }, 
+            },
             {
-              "code": "2",
-              "teacher": "CESPEDES GUIZADA MARIA BENITA",
-              "schedule": [
+              "code": 2006063,
+              "name": "FISICA GENERAL",
+              "groups": [
                 {
-                  "day": "MA",
-                  "start": "1115",
-                  "end": "1245",
-                  "duration": 2,
-                  "room": "690D",
-                  "teacher": "CESPEDES GUIZADA MARIA BENITA",
-                  "isClass": true
-                },
-                {
-                  "day": "VI",
-                  "start": "945",
-                  "end": "1115",
-                  "duration": 2,
-                  "room": "690D",
-                  "teacher": "CESPEDES GUIZADA MARIA BENITA",
-                  "isClass": true
+                  "code": "B",
+                  "teacher": "VALENZUELA MIRANDA ROBERTO",
+                  "schedule": [
+                    {
+                      "day": "MA",
+                      "start": "1115",
+                      "end": "1245",
+                      "room": "612"
+                    },
+                    {
+                      "day": "MI",
+                      "start": "1415",
+                      "end": "1545",
+                      "room": "692C"
+                    }
+                  ]
                 }
               ]
             }
@@ -70,20 +68,37 @@ open class ScheduleRepository(private val jsonSource: String? = null) {
     }
     """
 
-    open fun loadCourse(): Course {
-        val jsonToParse = jsonSource ?: defaultJson
+    fun loadCourse(): Course {
         val courseType = object : TypeToken<Course>() {}.type
-        return Gson().fromJson(jsonToParse, courseType)
+        return Gson().fromJson(jsonSource, courseType)
     }
 
-    fun getAllSchedules(): List<Schedule> {
+    fun getSelectedSubjects(): List<SelectedSubject> {
         val course = loadCourse()
-        val schedules = course.subjects
-            .flatMap { it.groups }
-            .flatMap { it.schedule }
 
-        return schedules
+        return course.levels.flatMap { level ->
+            level.subjects.flatMap { subject ->
+                subject.groups.map { group ->
+                    SelectedSubject(
+                        codeGroup = group.code,
+                        teacher = group.teacher,
+                        codeSubject = subject.code.toString(),
+                        name = subject.name,
+                        schedule = group.schedule.map {
+                            Schedule(
+                                day = it.day,
+                                start = normalizeHour(it.start),
+                                end = normalizeHour(it.end),
+                                room = it.room
+                            )
+                        }
+                    )
+                }
+            }
+        }
     }
 
+    private fun normalizeHour(hour: String): String {
+        return hour.padStart(4, '0') // Asegura que siempre tenga 4 caracteres, añadiendo '0' si es necesario
+    }
 }
-
