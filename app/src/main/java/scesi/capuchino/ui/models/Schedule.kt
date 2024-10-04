@@ -4,10 +4,7 @@ data class Schedule(
     val day: String,
     val start: String,
     val end: String,
-    val duration: Int,
-    val room: String,
-    val teacher: String,
-    val isClass: Boolean
+    val room: String
 )
 
 data class Group(
@@ -22,7 +19,19 @@ data class Subject(
     val groups: List<Group>
 )
 
-data class Course(
+data class Level(
     val code: String,
     val subjects: List<Subject>
+)
+
+data class Course(
+    val levels: List<Level>
+)
+
+data class SelectedSubject(
+    var codeGroup: String,
+    var teacher: String,
+    var codeSubject: String,
+    var name: String,
+    var schedule: List<Schedule> = listOf()
 )
