@@ -20,6 +20,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import scesi.capuchino.ui.models.SelectedSubject
 import scesi.capuchino.ui.repositories.ScheduleRepository
 import scesi.capuchino.ui.theme.CalendarioScesiTheme
 
@@ -28,12 +29,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         val scheduleRepository = ScheduleRepository()
+        val selectedSubjects = scheduleRepository.getSelectedSubjects()
         setContent {
             CalendarioScesiTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     CalendarScreen(
                         modifier = Modifier.padding(innerPadding),
-                        scheduleRepository = scheduleRepository
+                        selectedSubjects = selectedSubjects
                     )
                 }
             }
@@ -42,7 +44,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun CalendarScreen(modifier: Modifier = Modifier, scheduleRepository: ScheduleRepository) {
+fun CalendarScreen(modifier: Modifier = Modifier, selectedSubjects: List<SelectedSubject>) {
     Column(modifier = modifier.fillMaxSize()) {
         DaysOfWeekHeader()
         Box(
@@ -50,7 +52,7 @@ fun CalendarScreen(modifier: Modifier = Modifier, scheduleRepository: ScheduleRe
                 .fillMaxWidth()
                 .fillMaxHeight(0.4f) // Ocupa solo el 40% de la pantalla
         ) {
-            CalendarGrid(scheduleRepository = scheduleRepository)
+            CalendarGrid(selectedSubjects = selectedSubjects)
         }
     }
 }
@@ -59,8 +61,7 @@ fun CalendarScreen(modifier: Modifier = Modifier, scheduleRepository: ScheduleRe
 fun DaysOfWeekHeader(modifier: Modifier = Modifier) {
     val daysOfWeek = listOf("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado")
 
-    Row(modifier = modifier.fillMaxWidth()
-        .padding(top = 50.dp) ) {
+    Row(modifier = modifier.fillMaxWidth().padding(top = 50.dp)) {
         Spacer(modifier = Modifier.width(50.dp))
         daysOfWeek.forEach { day ->
             Box(
@@ -87,11 +88,7 @@ data class Tarea(val nombre: String)
 
 
 @Composable
-fun CalendarGrid(modifier: Modifier = Modifier, scheduleRepository: ScheduleRepository) {
-    val allSchedules = scheduleRepository.getAllSchedules()
-
-    println("Horarios obtenidos: $allSchedules")
-
+fun CalendarGrid(modifier: Modifier = Modifier, selectedSubjects: List<SelectedSubject>) {
     val hoursOfDay = generateSequence(6 * 60 + 45) { it + 45 }
         .takeWhile { it < 21 * 60 }
         .map { minutesToHourString(it) }
@@ -125,13 +122,13 @@ fun CalendarGrid(modifier: Modifier = Modifier, scheduleRepository: ScheduleRepo
                 repeat(6) { dayIndex ->
                     val dayCode = getDayCodeFromIndex(dayIndex)
 
-                    // Ajusta el formato de la hora para coincidir con el JSON
-                    val formattedHour = hour.replace(":", "").padStart(4, '0')
-                    val scheduleItem = allSchedules.find {
-                        it.day == dayCode && it.start == formattedHour
+                    // Busca en los horarios de las materias seleccionadas
+                    val subjectItem = selectedSubjects.find { subject ->
+                        subject.schedule.any { it.day == dayCode && it.start == hour.replace(":", "").padStart(4, '0') }
                     }
 
-                    if (scheduleItem != null) {
+                    if (subjectItem != null) {
+                        val schedule = subjectItem.schedule.find { it.day == dayCode && it.start == hour.replace(":", "").padStart(4, '0') }
                         Box(
                             modifier = Modifier
                                 .weight(1f)
@@ -142,14 +139,14 @@ fun CalendarGrid(modifier: Modifier = Modifier, scheduleRepository: ScheduleRepo
                         ) {
                             Column(modifier = Modifier.padding(1.dp)) {
                                 Text(
-                                    text = scheduleItem.teacher,
+                                    text = subjectItem.name, // Nombre de la materia
                                     fontSize = 9.sp,
-                                    color = Color.Black
+                                    color = Color.White
                                 )
                                 Text(
-                                    text = scheduleItem.room,
+                                    text = schedule?.room ?: "Sin aula", // Aula
                                     fontSize = 9.sp,
-                                    color = Color.Red
+                                    color = Color.White
                                 )
                             }
                         }
@@ -188,8 +185,10 @@ fun minutesToHourString(minutes: Int): String {
 @Preview(showBackground = true)
 @Composable
 fun CalendarScreenPreview() {
-    val repository = ScheduleRepository()
+    val scheduleRepository = ScheduleRepository()
+    val selectedSubjects = scheduleRepository.getSelectedSubjects()
+
     CalendarioScesiTheme {
-        CalendarScreen(scheduleRepository = repository)
+        CalendarScreen(selectedSubjects = selectedSubjects)
     }
 }
