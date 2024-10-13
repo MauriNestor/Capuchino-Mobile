@@ -94,22 +94,22 @@ fun CalendarGrid(modifier: Modifier = Modifier, selectedSubjects: List<SelectedS
         .map { minutesToHourString(it) }
         .toList()
 
-    val cellPadding = 4.dp
+    val cellPadding = 2.dp  // Reduce el padding
     val scrollState = rememberScrollState()
 
     Column(
         modifier = modifier
             .fillMaxWidth()
             .verticalScroll(scrollState)
-            .padding(cellPadding)
+            .padding(cellPadding)  // Reduce el padding aquí también
     ) {
         hoursOfDay.forEach { hour ->
-            Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max)) {
+            Row(modifier = Modifier.fillMaxWidth().height(45.dp)) {  // Ajusta la altura
                 Box(
                     modifier = Modifier
                         .width(50.dp)
                         .fillMaxHeight()
-                        .border(0.1.dp, Color.DarkGray)
+                        .border(0.5.dp, Color.DarkGray)  // Ajusta el grosor de la línea
                 ) {
                     Text(
                         text = hour,
@@ -132,20 +132,20 @@ fun CalendarGrid(modifier: Modifier = Modifier, selectedSubjects: List<SelectedS
                         Box(
                             modifier = Modifier
                                 .weight(1f)
-                                .padding(0.1.dp)
+                                .padding(0.5.dp)  // Reduce el padding interno
                                 .border(1.dp, Color.Black)
                                 .background(Color.Yellow),
-                            contentAlignment = Alignment.Center
+                            contentAlignment = Alignment.Center  // Asegura el centrado
                         ) {
-                            Column(modifier = Modifier.padding(1.dp)) {
+                            Column(modifier = Modifier.padding(1.dp)) {  // Reduce el padding interno del texto
                                 Text(
-                                    text = subjectItem.name, // Nombre de la materia
-                                    fontSize = 9.sp,
+                                    text = subjectItem.name,  // Nombre de la materia
+                                    fontSize = 8.sp,  // Ajusta el tamaño del texto
                                     color = Color.Black
                                 )
                                 Text(
-                                    text = schedule?.room ?: "Sin aula", // Aula
-                                    fontSize = 9.sp,
+                                    text = schedule?.room ?: "Sin aula",  // Aula
+                                    fontSize = 8.sp,  // Ajusta el tamaño del texto
                                     color = Color.Red
                                 )
                             }
@@ -155,7 +155,7 @@ fun CalendarGrid(modifier: Modifier = Modifier, selectedSubjects: List<SelectedS
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight()
-                                .border(0.1.dp, Color.DarkGray)
+                                .border(0.5.dp, Color.DarkGray)  // Ajusta el grosor de la línea
                         )
                     }
                 }
@@ -163,6 +163,7 @@ fun CalendarGrid(modifier: Modifier = Modifier, selectedSubjects: List<SelectedS
         }
     }
 }
+
 
 fun getDayCodeFromIndex(index: Int): String {
     return when (index) {
