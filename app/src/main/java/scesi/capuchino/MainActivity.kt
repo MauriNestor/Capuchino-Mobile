@@ -94,22 +94,22 @@ fun CalendarGrid(modifier: Modifier = Modifier, selectedSubjects: List<SelectedS
         .map { minutesToHourString(it) }
         .toList()
 
-    val cellPadding = 2.dp  // Reduce el padding
+    val cellPadding = 4.dp  // Mantén el padding general
     val scrollState = rememberScrollState()
 
     Column(
         modifier = modifier
             .fillMaxWidth()
             .verticalScroll(scrollState)
-            .padding(cellPadding)  // Reduce el padding aquí también
+            .padding(cellPadding)
     ) {
         hoursOfDay.forEach { hour ->
-            Row(modifier = Modifier.fillMaxWidth().height(45.dp)) {  // Ajusta la altura
+            Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max)) {
                 Box(
                     modifier = Modifier
                         .width(50.dp)
                         .fillMaxHeight()
-                        .border(0.5.dp, Color.DarkGray)  // Ajusta el grosor de la línea
+                        .border(0.5.dp, Color.DarkGray)
                 ) {
                     Text(
                         text = hour,
@@ -122,7 +122,6 @@ fun CalendarGrid(modifier: Modifier = Modifier, selectedSubjects: List<SelectedS
                 repeat(6) { dayIndex ->
                     val dayCode = getDayCodeFromIndex(dayIndex)
 
-                    // Busca en los horarios de las materias seleccionadas
                     val subjectItem = selectedSubjects.find { subject ->
                         subject.schedule.any { it.day == dayCode && it.start == hour.replace(":", "").padStart(4, '0') }
                     }
@@ -132,21 +131,23 @@ fun CalendarGrid(modifier: Modifier = Modifier, selectedSubjects: List<SelectedS
                         Box(
                             modifier = Modifier
                                 .weight(1f)
-                                .padding(0.5.dp)  // Reduce el padding interno
+                                .padding(0.5.dp)
                                 .border(1.dp, Color.Black)
                                 .background(Color.Yellow),
-                            contentAlignment = Alignment.Center  // Asegura el centrado
+                            contentAlignment = Alignment.Center
                         ) {
-                            Column(modifier = Modifier.padding(1.dp)) {  // Reduce el padding interno del texto
+                            Column(modifier = Modifier.padding(0.dp)) {  // Eliminar padding interno
                                 Text(
-                                    text = subjectItem.name,  // Nombre de la materia
-                                    fontSize = 8.sp,  // Ajusta el tamaño del texto
-                                    color = Color.Black
+                                    text = subjectItem.name,
+                                    fontSize = 9.sp,
+                                    color = Color.Black,
+                                    letterSpacing = 0.sp  // Reducir el espaciado entre letras
                                 )
                                 Text(
-                                    text = schedule?.room ?: "Sin aula",  // Aula
-                                    fontSize = 8.sp,  // Ajusta el tamaño del texto
-                                    color = Color.Red
+                                    text = schedule?.room ?: "Sin aula",
+                                    fontSize = 9.sp,
+                                    color = Color.Red,
+                                    letterSpacing = 0.sp  // Reducir el espaciado entre letras
                                 )
                             }
                         }
@@ -155,7 +156,7 @@ fun CalendarGrid(modifier: Modifier = Modifier, selectedSubjects: List<SelectedS
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight()
-                                .border(0.5.dp, Color.DarkGray)  // Ajusta el grosor de la línea
+                                .border(0.5.dp, Color.DarkGray)
                         )
                     }
                 }
